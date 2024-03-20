@@ -1,10 +1,56 @@
 import React, { useState } from "react";
+import { useEffect } from "react";
+import firebase from "../firebaseConfig"; // Assuming firebaseConfig is set up correctly
 import Shortened from "../assets/Shortened_1.png";
 import "../App.css";
 import NavBar from "./NavBar";
 import CollectedData from "./CollectedData";
 
 const HeroSection: React.FC = () => {
+  const [url, setUrl] = useState("");
+  const [shortenedUrls, setShortenedUrls] = useState([]);
+  const [isAuthenticated, setIsAuthenticated] = useState(false); // This should be replaced with actual authentication logic
+
+  const generateShortUrl = () => {
+    return `https://lnk.ly/${Math.random().toString(36).substr(2, 9)}`;
+  };
+
+  const handleShortenUrl = async () => {
+    if (!isAuthenticated && shortenedUrls.length >= 3) {
+      alert("Limit reached. Please log in to shorten more URLs.");
+      return;
+    }
+
+    const shortenedUrl = generateShortUrl();
+    const qrCode = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${shortenedUrl}`;
+    const newUrlData = { originalUrl: url, shortenedUrl, qrCode, clicks: 0 };
+
+    // Store in Firebase
+    const urlsRef = firebase.database().ref("urls");
+    const newUrlRef = urlsRef.push();
+    newUrlRef.set(newUrlData);
+
+    setShortenedUrls(
+      (prevUrls) => [...prevUrls, newUrlData] as typeof shortenedUrls,
+    );
+    setUrl("");
+  };
+
+  const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUrl(e.target.value);
+  };
+
+  // This is a placeholder function. Implement authentication logic as per your application's requirements.
+  const checkAuthentication = () => {
+    // Example: setIsAuthenticated(user !== null);
+    // For demonstration, let's assume the user is always authenticated
+    setIsAuthenticated(true);
+  };
+
+  useEffect(() => {
+    checkAuthentication();
+  }, []);
+
   return (
     <>
       <NavBar />
@@ -25,8 +71,9 @@ const HeroSection: React.FC = () => {
                   name=""
                   placeholder="Enter Link here"
                   id=""
+                  onChange={handleUrlChange}
                 />
-                <button>Shorten Now!</button>
+                <button onClick={handleShortenUrl}>Shorten Now!</button>
               </label>
             </div>
             <div className="clipboard_toggle">
