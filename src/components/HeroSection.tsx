@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useEffect } from "react";
-import firebase from "../firebaseConfig"; // Assuming firebaseConfig is set up correctly
+import { database } from "../firebase/firebase";
+import { ref, push, set } from "firebase/database";
 import Shortened from "../assets/Shortened_1.png";
 import "../App.css";
 import NavBar from "./NavBar";
@@ -26,9 +27,9 @@ const HeroSection: React.FC = () => {
     const newUrlData = { originalUrl: url, shortenedUrl, qrCode, clicks: 0 };
 
     // Store in Firebase
-    const urlsRef = firebase.database().ref("urls");
-    const newUrlRef = urlsRef.push();
-    newUrlRef.set(newUrlData);
+    const urlsRef = ref(database, "urls");
+    const newUrlRef = push(urlsRef);
+    set(newUrlRef, newUrlData);
 
     setShortenedUrls(
       (prevUrls) => [...prevUrls, newUrlData] as typeof shortenedUrls,

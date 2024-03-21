@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import "../loginpage.css";
 import { auth } from "../firebase/firebase";
+import "../loginpage.css";
 
 interface LoginFormProps {
   error: string;
@@ -14,7 +14,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ error, setError }) => {
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // const auth = getAuth();
     try {
       await signInWithEmailAndPassword(auth, email, password);
       // Handle successful login here, e.g., redirecting to another page
